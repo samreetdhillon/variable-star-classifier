@@ -54,6 +54,25 @@ super_label
 Rot_Irr      257429
 Eclipsing     82868
 Pulsating     38564
+Name: count, dtype: int64
+Accuracy: 0.9494716652442834
+
+Confusion Matrix:
+ [[22961   861  1039]
+ [ 2441  8982   146]
+ [ 1033   223 75973]]
+
+Classification Report:
+               precision    recall  f1-score   support
+
+   Eclipsing       0.87      0.92      0.90     24861
+   Pulsating       0.89      0.78      0.83     11569
+     Rot_Irr       0.98      0.98      0.98     77229
+
+    accuracy                           0.95    113659
+   macro avg       0.92      0.89      0.90    113659
+weighted avg       0.95      0.95      0.95    113659
+
 ```
 
 ## Extensions & Future Work
