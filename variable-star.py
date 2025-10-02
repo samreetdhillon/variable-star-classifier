@@ -18,7 +18,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-df = pd.read_csv("asassn_variables_x.csv")
+df = pd.read_csv("asassn_variables.csv")
 
 #define mapping directory
 group_mapping = {
@@ -45,10 +45,10 @@ group_mapping = {
 
 # Apply Mapping
 df["super_label"] = df["ML_classification"].map(group_mapping)
-print(df["super_label"].value_counts())
+#print(df["super_label"].value_counts())
 
 #Features X and Labels y
-X = df[["Period", "Amplitude", "Mean_gmag"]].values
+X = df[["Period", "Amplitude", "Mean_gmag", "LKSL_statistic", "bp_rp", "parallax_over_error"]].values
 y = df["super_label"].values
 
 #Split into training and test sets
@@ -62,6 +62,21 @@ X_test_scaled = scaler.transform(X_test)
 #Train Random Forest Classifier
 clf = RandomForestClassifier(n_estimators = 200, class_weight = "balanced", n_jobs=-1, random_state=42)
 clf.fit(X_train_scaled, y_train)
+
+# Get feature importances from trained model
+importances = clf.feature_importances_
+feature_names = ["Period", "Amplitude", "Mean_gmag", "LKSL_statistic", "bp_rp", "parallax_over_error"]
+
+# Sort by importance
+indices = np.argsort(importances)[::-1]
+
+# Plot
+plt.figure(figsize=(8, 5))
+plt.title("Feature Importance (Random Forest)")
+plt.bar(range(len(importances)), importances[indices], align="center")
+plt.xticks(range(len(importances)), [feature_names[i] for i in indices], rotation=45)
+plt.ylabel("Importance")
+plt.show()
 
 #Prediction and Accuracy Check
 y_pred = clf.predict(X_test_scaled)
