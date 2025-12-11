@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This repository contains a simple pipeline to classify variable stars into three broad categories:
+This repository contains a modular pipeline to classify variable stars into three broad categories:
 
 - **Eclipsing** (EA, EB, EW)
 - **Pulsating** (RR Lyrae, Cepheids, Delta Scuti, Mira/HADS)
@@ -14,56 +14,123 @@ Next, it computes basic physical properties for the subset of pulsating stars.
 
 ---
 
-## Overview of what the script does
+## Project Structure
 
-1. Loads the ASAS-SN catalog and maps detailed classes to coarse groups using [`group_mapping`](variable-star.py).
-2. Extracts features and labels (see [`X`](variable-star.py) and [`y`](variable-star.py)), splits into train/test sets, standardizes features, and trains a Random Forest classifier (`[`clf`](variable-star.py)`).
-3. Prints accuracy, confusion matrix, and classification report, and plots feature importances.
-4. Selects pulsating stars ([`df_pulsators`](variable-star.py]), filters for reliable parallaxes, computes distances, absolute magnitudes, and estimates:
-   - Effective temperature using [`teff_mucciarelli`](variable-star.py)
-   - Luminosity and radius (Stefan–Boltzmann)
-   - Mass using [`estimate_mass_from_luminosity`](variable-star.py)
-5. Saves the derived pulsator table to [pulsators_with_observables.csv](pulsators_with_observables.csv) and produces several diagnostic plots (HR diagram, histograms, mass–luminosity).
+```
+variable-star-classifier/
+├── src/
+│   ├── __init__.py              # Package initialization
+│   ├── classifier.py            # Classification module
+│   ├── stellar_properties.py   # Stellar properties computation
+│   └── visualization.py         # Plotting and visualization
+├── data/
+│   └── asassn_variables.csv    # Input catalog
+├── outputs/
+│   └── pulsators_with_observables.csv  # Generated output
+├── main.py                      # Main entry point
+├── requirements.txt             # Python dependencies
+└── readme.md                    # This file
+```
 
 ---
 
-## Important variables / functions
+## Overview of what the pipeline does
 
-- [`group_mapping`](variable-star.py) — mapping from ASAS-SN classes to coarse groups (Eclipsing, Pulsating, Rot_Irr).
-- [`feature_names`](variable-star.py) — features used by the classifier (Period, Amplitude, Mean_gmag, LKSL_statistic, bp_rp, parallax_over_error).
-- [`teff_mucciarelli`](variable-star.py) — empirical Teff estimator from bp−rp and [Fe/H].
-- [`estimate_mass_from_luminosity`](variable-star.py) — piecewise mass–luminosity relation.
-- [`df_pulsators`](variable-star.py) — filtered DataFrame of pulsating stars used for physical estimates.
+1. **Classification** (`src/classifier.py`):
 
-## Files
+   - Loads the ASAS-SN catalog and maps detailed classes to coarse groups
+   - Extracts features (Period, Amplitude, Mean_gmag, LKSL_statistic, bp_rp, parallax_over_error)
+   - Splits into train/test sets, standardizes features, and trains a Random Forest classifier
+   - Evaluates accuracy, confusion matrix, and classification report
 
-- [variable-star.py](variable-star.py) — main analysis script that performs classification, computes stellar parameters, and creates plots.
-- [asassn_variables.csv](asassn_variables.csv) — input catalog read by the script.
-- [pulsators_with_observables.csv](pulsators_with_observables.csv) — output produced by the script (pulsating-star table).
+2. **Stellar Properties** (`src/stellar_properties.py`):
+
+   - Filters pulsating stars with reliable parallaxes
+   - Computes distances, absolute magnitudes
+   - Estimates effective temperature using Mucciarelli et al. (2021) relation
+   - Calculates luminosity, radius (Stefan–Boltzmann law), and mass
+   - Generates summary statistics and saves results to CSV
+
+3. **Visualization** (`src/visualization.py`):
+
+   - Feature importance plots
+   - HR diagrams
+   - Distribution histograms (Teff, Luminosity, Radius)
+   - Teff–Luminosity and Mass–Luminosity relations
+
+4. **Main Orchestrator** (`main.py`):
+   - Coordinates the entire workflow from data loading to visualization
+
+---
+
+## Key Modules and Functions
+
+### `src/classifier.py`
+
+- **`VariableStarClassifier`** — Main classifier class with methods for:
+  - `prepare_data()` — Maps ASAS-SN classes to coarse groups
+  - `train()` — Trains Random Forest classifier
+  - `evaluate()` — Prints accuracy metrics
+  - `get_feature_importances()` — Returns feature importance values
+
+### `src/stellar_properties.py`
+
+- **`compute_stellar_properties()`** — Computes all physical properties for pulsating stars
+- **`teff_mucciarelli()`** — Empirical Teff estimator from bp−rp and [Fe/H]
+- **`estimate_mass_from_luminosity()`** — Piecewise mass–luminosity relation
+- **`print_summary_statistics()`** — Generates statistical summaries
+- **`save_pulsators_data()`** — Saves results to CSV
+
+### `src/visualization.py`
+
+- **`plot_feature_importances()`** — Feature importance bar chart
+- **`plot_hr_diagram()`** — Hertzsprung-Russell diagram
+- **`plot_derived_properties_histograms()`** — Teff, Luminosity, Radius distributions
+- **`plot_teff_luminosity()`** — Teff vs Luminosity scatter plot
+- **`plot_mass_luminosity()`** — Mass-Luminosity relation
+- **`create_all_plots()`** — Generates all visualizations
+
+---
 
 ## Requirements
 
 - Python 3.8+
-- Libraries: `numpy`, `pandas`, `scikit-learn`, `matplotlib`, `lightkurve`, `astroquery`
-  Install dependencies in a virtual environment via pip:
+- Dependencies listed in `requirements.txt`:
+  - `numpy`
+  - `pandas`
+  - `scikit-learn`
+  - `matplotlib`
+  - `scipy`
+  - `lightkurve`
+  - `astroquery`
+  - `requests`
+
+Install dependencies:
 
 ```sh
-python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+pip install -r requirements.txt
+```
+
+Or manually:
+
+```sh
 pip install numpy pandas matplotlib scipy scikit-learn astroquery lightkurve requests
 ```
 
 ## Usage
 
-1. Download the ASAS-SN variable star catalog (asassn_variables.csv).
+1. Ensure your data file is in the `data/` folder: `data/asassn_variables.csv`
 
-2. Run the script from the repository root:
+2. Run the main script from the repository root:
 
 ```sh
-python variable-star.py
+python main.py
 ```
 
-3. Output: console metrics, plots (interactive), and [pulsators_with_observables.csv](pulsators_with_observables.csv).
+3. Output:
+   - Console metrics and statistics
+   - Interactive plots
+   - CSV file: `outputs/pulsators_with_observables.csv`
 
 Example output for classifier:
 
@@ -159,13 +226,17 @@ File saved: pulsators_with_observables.csv
 ## Notes / Caveats
 
 - The Teff relation and the giant/dwarf cut are approximate; treat derived masses/radii as order-of-magnitude estimates.
-- The script uses a class-balanced Random Forest (`[`clf`](variable-star.py)`) — consider cross-validation or hyperparameter tuning for production use.
-- Columns expected in the input CSV include Period, Amplitude, Mean_gmag, LKSL_statistic, bp_rp, parallax, parallax_over_error, ML_classification.
-- T_eff is computed using an empirical relation, with the coefficients taken from [_A. Mucciarelli 2021_](https://arxiv.org/abs/2106.03882)
+- The classifier uses a class-balanced Random Forest — consider cross-validation or hyperparameter tuning for production use.
+- Required columns in input CSV: `Period`, `Amplitude`, `Mean_gmag`, `LKSL_statistic`, `bp_rp`, `parallax`, `parallax_over_error`, `ML_classification`.
+- Teff is computed using an empirical relation from [_A. Mucciarelli 2021_](https://arxiv.org/abs/2106.03882).
+- All generated outputs are saved to the `outputs/` folder.
 
 ## Extensions & Future Work
 
-- Implement deep learning models for higher-dimensional feature analysis.
+- Implement deep learning models for higher-dimensional feature analysis
+- Add cross-validation and hyperparameter optimization
+- Extend to additional variable star classes
+- Implement automated light curve analysis
 
 ## Author
 
