@@ -1,11 +1,11 @@
 import pandas as pd
-from classifier import VariableStarClassifier
-from stellar_properties import (
+from src.classifier import VariableStarClassifier
+from src.stellar_properties import (
     compute_stellar_properties,
     print_summary_statistics,
     save_pulsators_data
 )
-from visualization import create_all_plots
+from src.visualization import create_all_plots
 
 
 def main():
