@@ -12,7 +12,7 @@ It uses a publicly available **ASAS-SN Variable Star catalog** and applies a **R
 
 Next, it computes basic physical properties for the subset of pulsating stars.
 
-## Read the full project report [here](https://drive.google.com/file/d/1SuvBh0oF815aP6r2iZZ1k-ktR72Ov6bD/view?usp=sharing).
+## Read the full project report [here](https://drive.google.com/file/d/1cfCMLl_K5BFnsvc-xjDT24zDdwxNciRh/view?usp=sharing).
 
 ## Project Structure
 
