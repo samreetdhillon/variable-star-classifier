@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-
 class VariableStarClassifier:
     def __init__(self):
         self.group_mapping = {

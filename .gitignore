@@ -1,3 +1,5 @@
 *.csv
 *.fits
-venv
+*venv
+__pycache__
+outputs/

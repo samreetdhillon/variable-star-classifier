@@ -12,7 +12,7 @@ It uses a publicly available **ASAS-SN Variable Star catalog** and applies a **R
 
 Next, it computes basic physical properties for the subset of pulsating stars.
 
----
+## Read the full project report [here](https://drive.google.com/file/d/1SuvBh0oF815aP6r2iZZ1k-ktR72Ov6bD/view?usp=sharing).
 
 ## Project Structure
 
@@ -25,7 +25,7 @@ variable-star-classifier/
 │   └── visualization.py         # Plotting and visualization
 ├── data/
 │   └── asassn_variables.csv    # Input catalog
-├── outputs/
+├── outputs/ (not committed in the repository)
 │   └── pulsators_with_observables.csv  # Generated output
 ├── main.py                      # Main entry point
 ├── requirements.txt             # Python dependencies
@@ -37,14 +37,12 @@ variable-star-classifier/
 ## Overview of what the pipeline does
 
 1. **Classification** (`src/classifier.py`):
-
    - Loads the ASAS-SN catalog and maps detailed classes to coarse groups
    - Extracts features (Period, Amplitude, Mean_gmag, LKSL_statistic, bp_rp, parallax_over_error)
    - Splits into train/test sets, standardizes features, and trains a Random Forest classifier
    - Evaluates accuracy, confusion matrix, and classification report
 
 2. **Stellar Properties** (`src/stellar_properties.py`):
-
    - Filters pulsating stars with reliable parallaxes
    - Computes distances, absolute magnitudes
    - Estimates effective temperature using Mucciarelli et al. (2021) relation
@@ -52,7 +50,6 @@ variable-star-classifier/
    - Generates summary statistics and saves results to CSV
 
 3. **Visualization** (`src/visualization.py`):
-
    - Feature importance plots
    - HR diagrams
    - Distribution histograms (Teff, Luminosity, Radius)
@@ -226,7 +223,7 @@ File saved: pulsators_with_observables.csv
 ## Notes / Caveats
 
 - The Teff relation and the giant/dwarf cut are approximate; treat derived masses/radii as order-of-magnitude estimates.
-- The classifier uses a class-balanced Random Forest — consider cross-validation or hyperparameter tuning for production use.
+- The classifier uses a class-balanced Random Forest. So consider cross-validation or hyperparameter tuning for production use.
 - Required columns in input CSV: `Period`, `Amplitude`, `Mean_gmag`, `LKSL_statistic`, `bp_rp`, `parallax`, `parallax_over_error`, `ML_classification`.
 - Teff is computed using an empirical relation from [_A. Mucciarelli 2021_](https://arxiv.org/abs/2106.03882).
 - All generated outputs are saved to the `outputs/` folder.

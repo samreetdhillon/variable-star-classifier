@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from src.classifier import VariableStarClassifier
 from src.stellar_properties import (
     compute_stellar_properties,
@@ -6,7 +7,6 @@ from src.stellar_properties import (
     save_pulsators_data
 )
 from src.visualization import create_all_plots
-
 
 def main():
     # Load data
@@ -54,12 +54,14 @@ def main():
     print("="*80)
     print("\nGenerating plots...")
     
-    create_all_plots(df_pulsators, importances, feature_names, indices)
+    # Pass test/pred arrays and class labels into plotting utilities
+    classes = np.unique(y_test)
+    create_all_plots(df_pulsators, importances, feature_names, indices,
+                     y_test=y_test, y_pred=y_pred, classes=classes)
     
     print("\n" + "="*80)
     print("Analysis Complete!")
     print("="*80)
-
 
 if __name__ == "__main__":
     main()
