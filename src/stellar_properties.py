@@ -19,8 +19,7 @@ def compute_stellar_properties(df):
     # Distance modulus formula
     df_pulsators["abs_gmag"] = df_pulsators["Mean_gmag"] - 5 * np.log10(df_pulsators["distance_pc"]) + 5
 
-    # 4. Refined Giant vs Dwarf cut (Color-Dependent)
-    # A simple vertical cut is often wrong. 
+    # 4. Giant vs Dwarf cut (Color-Dependent)
     # Usually, if bp_rp > 0.8 and abs_gmag < 3.5, it's a Giant.
     # If bp_rp < 0.8, the cut should be more aggressive (around abs_gmag < 2).
     is_giant = (
@@ -32,8 +31,7 @@ def compute_stellar_properties(df):
     # 5. Assign Metallicity
     df_pulsators["Fe_H"] = np.where(df_pulsators["star_type"] == "Giant", -0.5, 0.0)
 
-    # 6. Compute Teff (Vectorized if possible, otherwise apply)
-    # Note: Teff is used in the Stefan-Boltzmann law below
+    # 6. Compute Teff
     df_pulsators["Teff"] = df_pulsators.apply(
         lambda row: teff_mucciarelli(row["bp_rp"], row["Fe_H"], row["star_type"]),
         axis=1
@@ -69,8 +67,7 @@ def teff_mucciarelli(bp_rp, Fe_H, star_type):
     # Calculate theta (5040/Teff)
     theta = b0 + b1 * C + b2 * C**2 + b3 * Fe_H + b4 * Fe_H**2 + b5 * Fe_H * C
     
-    # Safety Check: Ensure theta is positive and within physical bounds
-    # theta ~ 0.5 is 10,000K, theta ~ 2.0 is 2,500K
+    # A Safety Check to ensure theta is positive and within physical bounds
     theta = np.clip(theta, 0.4, 2.5) 
 
     Teff = 5040 / theta
@@ -79,7 +76,7 @@ def teff_mucciarelli(bp_rp, Fe_H, star_type):
 def estimate_mass_from_luminosity(L):
     """
     Estimates stellar mass using a continuous piecewise Mass-Luminosity relation.
-    The constants (k) ensure the function is continuous at the boundaries.
+    The constants (k) ensure the function is approximately continuous at the boundaries.
     """
     # Handle L <= 0 to avoid math errors
     if L <= 0:
@@ -104,13 +101,13 @@ def estimate_mass_from_luminosity(L):
         
     else:             
         # M > 20 M_sun: L ~ M (Eddington limit scaling)
-        M = L  # alpha = 1.0
+        M = L / 32000  # alpha = 1.0
 
     # Clip to physical limits for variable stars (0.1 to 50 M_sun)
     return np.clip(M, 0.1, 50.0)
 
 def print_summary_statistics(df_pulsators):
-    # Ensure columns exist before printing to avoid KeyError
+    # Avoid Keyerror by checking the columns exist before printing
     physical_cols = [c for c in ["Teff", "Luminosity", "Radius", "Mass", "abs_gmag", "distance_pc"] if c in df_pulsators.columns]
     corr_cols = [c for c in ["Period", "Amplitude", "Mass", "Luminosity", "Radius", "Teff"] if c in df_pulsators.columns]
 
@@ -121,7 +118,6 @@ def print_summary_statistics(df_pulsators):
     print("-" * 85 + "\n")
 
     print("--------------------- Correlation Matrix ------------------------------")
-    # numeric_only=True is vital for newer Pandas versions
     print(df_pulsators[corr_cols].corr(numeric_only=True))
     print("-" * 72 + "\n")
 

@@ -4,9 +4,7 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 
 def plot_confusion_matrix(y_test, y_pred, classes):
-    """
-    Plots a heatmap of the confusion matrix to identify misclassifications.
-    """
+    # Plots a heatmap of the confusion matrix to identify misclassifications.
     cm = confusion_matrix(y_test, y_pred, labels=classes)
     plt.figure(figsize=(10, 8))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
@@ -65,8 +63,8 @@ def plot_teff_luminosity(df_pulsators):
     plt.figure(figsize=(6, 5))
     plt.scatter(df_pulsators["Teff"], df_pulsators["Luminosity"],
                 s=5, c=df_pulsators["Radius"], cmap="viridis", alpha=0.7)
-    plt.yscale('log') # Add this line
-    plt.gca().invert_xaxis() # Optional: Astronomers usually put hotter Teff on the left
+    plt.yscale('log')
+    plt.gca().invert_xaxis()
     plt.colorbar(label="Radius (R/R☉)")
     plt.xlabel("Effective Temperature (K)")
     plt.ylabel("Luminosity (L/L☉)")

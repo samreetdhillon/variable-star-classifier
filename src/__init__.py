@@ -1,7 +1,5 @@
 """
-Variable Star Classifier Package
-
-A package for classifying variable stars and computing their physical properties.
+Variable Star Classifier Package: For classifying variable stars and computing their physical properties.
 """
 
 from .classifier import VariableStarClassifier
